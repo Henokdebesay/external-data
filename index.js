@@ -10,6 +10,7 @@ const progressBar = document.getElementById("progressBar");
 // The get favourites button element.
 const getFavouritesBtn = document.getElementById("getFavouritesBtn");
 
+const carousel = document.getElementById("carouselExampleControls");
 // Step 0: Store your API key here for reference and easy access.
 const API_KEY = "live_76RQ2VaUsIvaru76HtSSrLzoqgHVemYvLHHpRW7G8WVaIs9PtlOsQuQ7D4seb3mq";
 
@@ -22,7 +23,7 @@ const API_KEY = "live_76RQ2VaUsIvaru76HtSSrLzoqgHVemYvLHHpRW7G8WVaIs9PtlOsQuQ7D4
  * This function should execute immediately.
  */
 (async function initialLoad() {
-  fetch(`https://api.thecatapi.com/v1/images/search?limit=10&api_key=${API_KEY}`)
+  fetch(`https://api.thecatapi.com/v1/images/search?limit=2&api_key=${API_KEY}`)
     .then(response => response.json())
     .then(data => {
       data.forEach((array) => {
@@ -30,7 +31,7 @@ const API_KEY = "live_76RQ2VaUsIvaru76HtSSrLzoqgHVemYvLHHpRW7G8WVaIs9PtlOsQuQ7D4
       option.id = array.id;
       option.innerText = array.id
       breedSelect.appendChild(option)
-      console.log(data)
+      // console.log(data)
 
       })
     })
@@ -54,6 +55,25 @@ const API_KEY = "live_76RQ2VaUsIvaru76HtSSrLzoqgHVemYvLHHpRW7G8WVaIs9PtlOsQuQ7D4
  * - Each new selection should clear, re-populate, and restart the Carousel.
  * - Add a call to this function to the end of your initialLoad function above to create the initial carousel.
  */
+breedSelect.addEventListener("change", (e)=> {
+  fetch(`https://api.thecatapi.com/v1/images/search?limit=2&api_key=${API_KEY}`)
+    .then(response => response.json())
+    .then(data => {
+      data.forEach((array) => {
+        var selectedOption = e.target.value;
+
+        let img = document.createElement('img');
+      img.src = array.url;
+      carousel.appendChild(img)
+      })
+
+    })
+    .catch(error => {
+      console.error("Error fetching data:", error);
+    });
+
+})
+
 
 /**
  * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
