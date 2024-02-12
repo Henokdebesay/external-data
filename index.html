@@ -11,26 +11,23 @@
       integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ"
       crossorigin="anonymous"
     />
-
+    
     <!-- Our Styles -->
-    <link href="styles.css" rel="stylesheet" />
-
+    <link href="./styles.css" rel="stylesheet" />
+    
     <!-- jQuery -->
     <script
       src="https://code.jquery.com/jquery-3.6.4.min.js"
       integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8="
       crossorigin="anonymous"
-    ></script>
+      defer></script>
 
     <!-- Axios -->
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js" defer></script>
 
     <!-- Our Scripts -->
-    <script type="module" src="Carousel.js"></script>
-    <script type="module" src="index.js"></script>
-
     <script type="importmap">
-      {   
+      {
         "imports": {
           "@popperjs/core": "https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/esm/popper.min.js",
           "axios" : "https://cdn.skypack.dev/axios",
@@ -38,6 +35,11 @@
         }
       }
     </script>
+
+    <script type="module" src="./Carousel.js" defer></script>
+    <script type="module" src="./index.js" defer></script>
+
+    
 
   </head>
 
