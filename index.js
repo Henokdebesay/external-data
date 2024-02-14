@@ -23,7 +23,7 @@ const API_KEY = "live_76RQ2VaUsIvaru76HtSSrLzoqgHVemYvLHHpRW7G8WVaIs9PtlOsQuQ7D4
  * This function should execute immediately.
  */
 (async function initialLoad() {
-  fetch(`https://api.thecatapi.com/v1/images/search?limit=10&api_key=${API_KEY}`)
+  fetch(`https://api.thecatapi.com/v1/images/search?limit=2&api_key=${API_KEY}`)
     .then(response => response.json())
     .then(data => {
       data.forEach((array) => {
@@ -55,32 +55,54 @@ const API_KEY = "live_76RQ2VaUsIvaru76HtSSrLzoqgHVemYvLHHpRW7G8WVaIs9PtlOsQuQ7D4
  * - Each new selection should clear, re-populate, and restart the Carousel.
  * - Add a call to this function to the end of your initialLoad function above to create the initial carousel.
  */
-breedSelect.addEventListener("change", async (e) => {
-  await updateCarousel();
-});
+breedSelect.addEventListener("change", (e) => {
+  // Clear carousel
+  carousel.innerHTML = '';
 
-// Function to update carousel based on selected breed
-async function updateCarousel() {
-  try {
-    const selectedBreedId = breedSelect.value;
-    const response = await axios.get(`https://api.thecatapi.com/v1/images/search?limit=10&breed_ids=${selectedBreedId}`, {
-      headers: {
-        'x-api-key': API_KEY
-      }
-    });
-    const images = response.data;
-    carousel.innerHTML = ""; // Clear previous carousel items
-    images.forEach(image => {
-      let img = document.createElement('img');
-      img.src = image.url;
-      carousel.appendChild(img);
-    });
-    // Update informational section within infoDump element
-    infoDump.innerHTML = `<h3>${selectedBreedId}</h3>`;
-  } catch (error) {
-    console.error("Error fetching images:", error);
-  }
-}
+  // Clear infoDump
+  infoDump.innerHTML = '';
+
+  // Retrieve information on the selected breed from the cat API
+  fetch(`https://api.thecatapi.com/v1/images/search?limit=2&breed_id=${e.target.value}&api_key=${API_KEY}`)
+      .then(response => response.json())
+      .then(data => {
+          // Iterate through each image data
+          data.forEach(imageData => {
+              // Create new image element
+              let img = document.createElement('img');
+              img.src = imageData.url;
+              // Append image to carousel
+              carousel.appendChild(img);
+          });
+
+          // Retrieve breed information
+          fetch(`https://api.thecatapi.com/v1/breeds/search?q=${e.target.value}&api_key=${API_KEY}`)
+              .then(response => response.json())
+              .then(breedData => {
+                  // Create heading for breed info
+                  let heading = document.createElement('h2');
+                  heading.textContent = "Breed Information";
+                  // Append heading to infoDump
+                  infoDump.appendChild(heading);
+
+                  // Create paragraph for each piece of breed information
+                  for (const key in breedData[0]) {
+                      if (breedData[0][key] !== null && breedData[0][key] !== '') {
+                          let paragraph = document.createElement('p');
+                          paragraph.innerHTML = `<strong>${key}:</strong> ${breedData[0][key]}`;
+                          // Append paragraph to infoDump
+                          infoDump.appendChild(paragraph);
+                      }
+                  }
+              })
+              .catch(error => {
+                  console.error("Error fetching breed data:", error);
+              });
+      })
+      .catch(error => {
+          console.error("Error fetching image data:", error);
+      });
+});
 
 
 /**
