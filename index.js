@@ -23,16 +23,21 @@ const API_KEY = "live_76RQ2VaUsIvaru76HtSSrLzoqgHVemYvLHHpRW7G8WVaIs9PtlOsQuQ7D4
  * This function should execute immediately.
  */
 (async function initialLoad() {
-  fetch(`https://api.thecatapi.com/v1/images/search?limit=2&api_key=${API_KEY}`)
+  fetch(`https://api.thecatapi.com/v1/images/search?limit=120&api_key=${API_KEY}`)
     .then(response => response.json())
     .then(data => {
       data.forEach((array) => {
-        let option = document.createElement("option")
-      option.id = array.id;
-      option.innerText = array.id
-      breedSelect.appendChild(option)
-      // console.log(data)
+        if (array.breeds.length <= 0){
+          return ''
+        }else if (array.breeds.length > 0){
 
+          let option = document.createElement("option")
+          option.id = array.id;
+          option.innerText = array.breeds[0].name
+          breedSelect.appendChild(option)
+            console.log(data)
+        }
+       
       })
     })
     .catch(error => {
@@ -63,7 +68,7 @@ breedSelect.addEventListener("change", (e) => {
   infoDump.innerHTML = '';
 
   // Retrieve information on the selected breed from the cat API
-  fetch(`https://api.thecatapi.com/v1/images/search?limit=2&breed_id=${e.target.value}&api_key=${API_KEY}`)
+  fetch(`https://api.thecatapi.com/v1/images/search?limit=10&api_key=${API_KEY}`)
       .then(response => response.json())
       .then(data => {
           // Iterate through each image data
@@ -71,12 +76,13 @@ breedSelect.addEventListener("change", (e) => {
               // Create new image element
               let img = document.createElement('img');
               img.src = imageData.url;
+              console.log(imageData)
               // Append image to carousel
               carousel.appendChild(img);
           });
 
-          // Retrieve breed information
-          fetch(`https://api.thecatapi.com/v1/breeds/search?q=${e.target.value}&api_key=${API_KEY}`)
+  // Retrieve breed information
+  fetch(`https://api.thecatapi.com/v1/images/search?limit=10&api_key=${API_KEY}`)
               .then(response => response.json())
               .then(breedData => {
                   // Create heading for breed info
@@ -105,9 +111,7 @@ breedSelect.addEventListener("change", (e) => {
 });
 
 
-/**
- * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
- */
+
 /**
  * 4. Change all of your fetch() functions to axios!
  * - axios has already been imported for you within index.js.
