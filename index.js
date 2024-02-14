@@ -23,7 +23,7 @@ const API_KEY = "live_76RQ2VaUsIvaru76HtSSrLzoqgHVemYvLHHpRW7G8WVaIs9PtlOsQuQ7D4
  * This function should execute immediately.
  */
 (async function initialLoad() {
-  fetch(`https://api.thecatapi.com/v1/images/search?limit=2&api_key=${API_KEY}`)
+  fetch(`https://api.thecatapi.com/v1/images/search?limit=10&api_key=${API_KEY}`)
     .then(response => response.json())
     .then(data => {
       data.forEach((array) => {
@@ -55,24 +55,32 @@ const API_KEY = "live_76RQ2VaUsIvaru76HtSSrLzoqgHVemYvLHHpRW7G8WVaIs9PtlOsQuQ7D4
  * - Each new selection should clear, re-populate, and restart the Carousel.
  * - Add a call to this function to the end of your initialLoad function above to create the initial carousel.
  */
-breedSelect.addEventListener("change", (e)=> {
-  fetch(`https://api.thecatapi.com/v1/images/search?limit=2&api_key=${API_KEY}`)
-    .then(response => response.json())
-    .then(data => {
-      data.forEach((array) => {
-        var selectedOption = e.target.value;
+breedSelect.addEventListener("change", async (e) => {
+  await updateCarousel();
+});
 
-        let img = document.createElement('img');
-      img.src = array.url;
-      carousel.appendChild(img)
-      })
-
-    })
-    .catch(error => {
-      console.error("Error fetching data:", error);
+// Function to update carousel based on selected breed
+async function updateCarousel() {
+  try {
+    const selectedBreedId = breedSelect.value;
+    const response = await axios.get(`https://api.thecatapi.com/v1/images/search?limit=10&breed_ids=${selectedBreedId}`, {
+      headers: {
+        'x-api-key': API_KEY
+      }
     });
-
-})
+    const images = response.data;
+    carousel.innerHTML = ""; // Clear previous carousel items
+    images.forEach(image => {
+      let img = document.createElement('img');
+      img.src = image.url;
+      carousel.appendChild(img);
+    });
+    // Update informational section within infoDump element
+    infoDump.innerHTML = `<h3>${selectedBreedId}</h3>`;
+  } catch (error) {
+    console.error("Error fetching images:", error);
+  }
+}
 
 
 /**
