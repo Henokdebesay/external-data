@@ -10,7 +10,7 @@ const progressBar = document.getElementById("progressBar");
 // The get favourites button element.
 const getFavouritesBtn = document.getElementById("getFavouritesBtn");
 
-const carousel = document.getElementById("carouselExampleControls");
+const carousel = document.getElementById("carouselInner");
 // Step 0: Store your API key here for reference and easy access.
 const API_KEY = "live_76RQ2VaUsIvaru76HtSSrLzoqgHVemYvLHHpRW7G8WVaIs9PtlOsQuQ7D4seb3mq";
 
@@ -23,7 +23,7 @@ const API_KEY = "live_76RQ2VaUsIvaru76HtSSrLzoqgHVemYvLHHpRW7G8WVaIs9PtlOsQuQ7D4
  * This function should execute immediately.
  */
 (async function initialLoad() {
-  fetch(`https://api.thecatapi.com/v1/images/search?limit=120&api_key=${API_KEY}`)
+  fetch(`https://api.thecatapi.com/v1/images/search?limit=50&api_key=${API_KEY}`)
     .then(response => response.json())
     .then(data => {
       data.forEach((array) => {
@@ -35,7 +35,7 @@ const API_KEY = "live_76RQ2VaUsIvaru76HtSSrLzoqgHVemYvLHHpRW7G8WVaIs9PtlOsQuQ7D4
           option.id = array.id;
           option.innerText = array.breeds[0].name
           breedSelect.appendChild(option)
-            console.log(data)
+          console.log(data)
         }
        
       })
@@ -67,47 +67,69 @@ breedSelect.addEventListener("change", (e) => {
   // Clear infoDump
   infoDump.innerHTML = '';
 
-  // Retrieve information on the selected breed from the cat API
-  fetch(`https://api.thecatapi.com/v1/images/search?limit=10&api_key=${API_KEY}`)
-      .then(response => response.json())
-      .then(data => {
-          // Iterate through each image data
-          data.forEach(imageData => {
-              // Create new image element
-              let img = document.createElement('img');
-              img.src = imageData.url;
-              console.log(imageData)
-              // Append image to carousel
-              carousel.appendChild(img);
-          });
+  const selectedBreed = e.target.value; // Get the value of the selected breed
 
-  // Retrieve breed information
-  fetch(`https://api.thecatapi.com/v1/images/search?limit=10&api_key=${API_KEY}`)
-              .then(response => response.json())
-              .then(breedData => {
-                  // Create heading for breed info
-                  let heading = document.createElement('h2');
-                  heading.textContent = "Breed Information";
-                  // Append heading to infoDump
-                  infoDump.appendChild(heading);
+  // Fetch images for the selected breed
+  fetch(`https://api.thecatapi.com/v1/images/search?limit=50&api_key=${API_KEY}`)
+    .then(response => response.json())
+    .then(data => {
+      // Iterate through each image data
+      data.forEach(imageData => {
+        // Create new image element
+        let img = document.createElement('img');
+        img.src = imageData.url;
+        img.style.width = "6vh"; 
+        img.style.width = "12vh";
 
-                  // Create paragraph for each piece of breed information
-                  for (const key in breedData[0]) {
-                      if (breedData[0][key] !== null && breedData[0][key] !== '') {
-                          let paragraph = document.createElement('p');
-                          paragraph.innerHTML = `<strong>${key}:</strong> ${breedData[0][key]}`;
-                          // Append paragraph to infoDump
-                          infoDump.appendChild(paragraph);
-                      }
-                  }
-              })
-              .catch(error => {
-                  console.error("Error fetching breed data:", error);
-              });
-      })
-      .catch(error => {
-          console.error("Error fetching image data:", error);
+
+        // Append image to carousel
+        carousel.appendChild(img);
       });
+    })
+    .catch(error => {
+      console.error("Error fetching image data:", error);
+    });
+
+  // Fetch breed information for the selected breed
+  fetch(`https://api.thecatapi.com/v1/breeds/search?q=${selectedBreed}&api_key=${API_KEY}`)
+    .then(response => response.json())
+    .then(breedData => {
+      if (breedData.length > 0) {
+        const breed = breedData[0]; // Assuming there's only one breed returned
+
+        // Create heading for breed info
+        let heading = document.createElement('h2');
+        heading.textContent = "Breed Information";
+
+        // Append heading to infoDump
+        infoDump.appendChild(heading);
+
+        // Create paragraph for each piece of breed information
+        let paragraph1 = document.createElement('p');
+        paragraph1.innerHTML = `<strong>Name:</strong> ${breed.name}`;
+
+        let paragraph2 = document.createElement('p');
+        paragraph2.innerHTML = `<strong>Origin:</strong> ${breed.origin}`;
+
+        let paragraph3 = document.createElement('p');
+        paragraph3.innerHTML = `<strong>Description:</strong> ${breed.description}`;
+
+        // Append paragraphs to infoDump
+        infoDump.appendChild(paragraph1);
+        infoDump.appendChild(paragraph2);
+        infoDump.appendChild(paragraph3);
+      } else {
+        // If breed data is not found
+        let errorMessage = document.createElement('p');
+        errorMessage.textContent = "Breed information not found.";
+
+        // Append error message to infoDump
+        infoDump.appendChild(errorMessage);
+      }
+    })
+    .catch(error => {
+      console.error("Error fetching breed data:", error);
+    });
 });
 
 
@@ -161,8 +183,36 @@ breedSelect.addEventListener("change", (e) => {
  * - You can call this function by clicking on the heart at the top right of any image.
  */
 export async function favourite(imgId) {
-  // your code here
+  try {
+    // Assuming you have an API endpoint to favorite an image by its ID
+    const response = await fetch(`https://api.example.com/favorite/${imgId}`, {
+      method: 'POST', // Assuming favoriting requires a POST request
+      headers: {
+        'Content-Type': 'application/json',
+        // Include any necessary authentication headers, e.g., authorization token
+        'Authorization': 'Bearer YOUR_AUTH_TOKEN'
+      },
+      // You can include additional data if required
+      body: JSON.stringify({}) // Empty body as an example
+    });
+
+    if (!response.ok) {
+      // Handle non-successful responses here
+      throw new Error('Failed to favorite image');
+    }
+
+    // Parse the response data if needed
+    const data = await response.json();
+
+    // Return any relevant data
+    return data;
+  } catch (error) {
+    // Handle errors
+    console.error('Error favoriting image:', error);
+    throw error; // Propagate the error to the caller
+  }
 }
+
 
 /**
  * 9. Test your favourite() function by creating a getFavourites() function.
